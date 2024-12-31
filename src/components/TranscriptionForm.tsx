@@ -4,19 +4,21 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 interface TranscriptionFormProps {
-  apiKey: string;
   onTranscriptionComplete: (text: string) => void;
 }
 
-const TranscriptionForm = ({ apiKey, onTranscriptionComplete }: TranscriptionFormProps) => {
+const TranscriptionForm = ({ onTranscriptionComplete }: TranscriptionFormProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Hardcoded API key
+  const apiKey = "AIzaSyBo37RtCK2JQa6W6MyN8qN-ocvgShVLWDQ";
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (!selectedFile.type.startsWith('audio/')) {
+      if (!selectedFile.type.startsWith("audio/")) {
         toast({
           title: "Invalid file type",
           description: "Please select an audio file",
@@ -38,36 +40,32 @@ const TranscriptionForm = ({ apiKey, onTranscriptionComplete }: TranscriptionFor
       return;
     }
 
-    if (!apiKey) {
-      toast({
-        title: "No API key",
-        description: "Please save your API key first",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     try {
-      const response = await fetch('https://speech.googleapis.com/v1/speech:recognize', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        "https://speech.googleapis.com/v1/speech:recognize",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Transcription failed');
+        throw new Error("Transcription failed");
       }
 
       const data = await response.json();
-      const transcriptionText = data.results?.[0]?.alternatives?.[0]?.transcript || 'No transcription available';
+      const transcriptionText =
+        data.results?.[0]?.alternatives?.[0]?.transcript ||
+        "No transcription available";
       onTranscriptionComplete(transcriptionText);
-      
+
       toast({
         title: "Success",
         description: "Audio transcription completed",
