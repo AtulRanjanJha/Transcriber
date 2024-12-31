@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TranscriptionComponent from "./ApiKeyInput"; // Import the updated TranscriptionComponent
+import TranscriptionComponent from "./ApiKeyForm"; // Import the updated TranscriptionComponent
 
 const AudioTranscription = () => {
   const [transcription, setTranscription] = useState<string>("");
